@@ -54,19 +54,121 @@ if ('serviceWorker' in navigator) {
 }
 
 const dialog = document.querySelector('#case-dialog');
+cases.push(...newCases);
+cases.forEach(item => { item.pages ??= [{src: `assets/${item.id}-cover.png`, title: item.alt}]; });
+const grid = document.querySelector('.work-grid');
+for (const item of newCases) {
+  const article = document.createElement('article');
+  article.className = 'work-card';
+  const cover = document.createElement('button');
+  cover.className = `cover-button ${item.id}`;
+  cover.dataset.case = item.id;
+  cover.setAttribute('aria-haspopup', 'dialog');
+  cover.setAttribute('aria-label', `查看${item.label}示例：${item.title}，共4张`);
+  const image = document.createElement('img');
+  image.src = item.pages[0].src;
+  image.alt = item.alt;
+  image.width = 1080;
+  image.height = 1440;
+  image.loading = 'lazy';
+  image.decoding = 'async';
+  const badge = document.createElement('span');
+  badge.className = 'page-badge';
+  badge.textContent = '4 张图文';
+  const view = document.createElement('span');
+  view.className = 'view-label';
+  view.textContent = '查看整组 ↗';
+  cover.append(image, badge, view);
+  const meta = document.createElement('div');
+  meta.className = 'work-meta';
+  const label = document.createElement('span');
+  label.textContent = item.category.replace(' · 设计示例', '');
+  const style = document.createElement('span');
+  style.textContent = item.style;
+  meta.append(label, style);
+  const heading = document.createElement('h3');
+  const title = document.createElement('button');
+  title.dataset.case = item.id;
+  title.setAttribute('aria-haspopup', 'dialog');
+  title.textContent = item.title;
+  heading.append(title);
+  const description = document.createElement('p');
+  description.textContent = item.teaser;
+  article.append(cover, meta, heading, description);
+  grid.append(article);
+}
+document.querySelector('#works-count').textContent = String(cases.length).padStart(2, '0');
+const gallery = document.createElement('div');
+gallery.className = 'gallery-navigation';
+gallery.innerHTML = '<div class="page-controls"><button type="button" id="previous-page" class="icon-button" aria-label="上一张图片">←</button><span id="page-counter" aria-live="polite"></span><button type="button" id="next-page" class="icon-button" aria-label="下一张图片">→</button></div><div id="page-thumbnails" aria-label="选择图片"></div><p id="page-caption"></p>';
+document.querySelector('#case-image').after(gallery);
+const previousPage = document.querySelector('#previous-page');
+const nextPage = document.querySelector('#next-page');
+const thumbnails = document.querySelector('#page-thumbnails');
+const imageStatus = document.createElement('p');
+imageStatus.className = 'image-status';
+imageStatus.setAttribute('role', 'status');
+imageStatus.hidden = true;
+imageStatus.textContent = '图片暂时未能加载，请切换图片或稍后重试。';
+document.querySelector('#case-image').after(imageStatus);
+document.querySelector('#case-image').addEventListener('error', () => { imageStatus.hidden = false; });
+document.querySelector('#case-image').addEventListener('load', () => { imageStatus.hidden = true; });
+const outlineHeading = document.querySelector('#case-outline').previousElementSibling;
+const copyButton = document.createElement('button');
+copyButton.className = 'copy-button';
+copyButton.type = 'button';
+copyButton.textContent = '复制配套文案';
+document.querySelector('#case-tags').after(copyButton);
+const copyStatus = document.createElement('span');
+copyStatus.className = 'copy-status';
+copyStatus.setAttribute('role', 'status');
+copyButton.after(copyStatus);
 let selectedCase = 0;
+let selectedPage = 0;
 let triggerElement = null;
+function renderPage(index) {
+  const item = cases[selectedCase];
+  selectedPage = Math.max(0, Math.min(index, item.pages.length - 1));
+  const page = item.pages[selectedPage];
+  const image = document.querySelector('#case-image');
+  imageStatus.hidden = true;
+  image.src = page.src;
+  image.alt = `${item.label || item.title}，第${selectedPage + 1}张：${page.title}`;
+  const download = document.querySelector('#case-download');
+  download.href = page.src;
+  download.download = `心安之地-${item.id}-${String(selectedPage + 1).padStart(2, '0')}.png`;
+  download.textContent = item.pages.length > 1 ? '下载当前原图 ↓' : '下载封面原图 ↓';
+  gallery.hidden = item.pages.length === 1;
+  previousPage.disabled = selectedPage === 0;
+  nextPage.disabled = selectedPage === item.pages.length - 1;
+  document.querySelector('#page-counter').textContent = `第 ${selectedPage + 1} / ${item.pages.length} 张`;
+  document.querySelector('#page-caption').textContent = page.title;
+  [...thumbnails.children].forEach((button, i) => button.setAttribute('aria-pressed', String(i === selectedPage)));
+}
 function renderCase(index) {
   selectedCase = (index + cases.length) % cases.length;
   const item = cases[selectedCase];
   const values = {'case-counter': `设计示例 ${selectedCase + 1} / ${cases.length}`, 'case-category': item.category, 'case-title': item.title, 'case-summary': item.summary, 'case-design': item.design, 'case-copy-title': item.copyTitle, 'case-copy': item.copy, 'case-tags': item.tags};
   for (const [id, value] of Object.entries(values)) document.getElementById(id).textContent = value;
-  const image = document.querySelector('#case-image');
-  image.src = `assets/${item.id}-cover.png`;
-  image.alt = item.alt;
-  const download = document.querySelector('#case-download');
-  download.href = image.getAttribute('src');
-  download.download = `心安之地-${item.id}-设计示例.png`;
+  thumbnails.replaceChildren(...item.pages.map((page, i) => {
+    const button = document.createElement('button');
+    button.className = 'page-thumbnail';
+    button.type = 'button';
+    button.setAttribute('aria-label', `查看第${i + 1}张：${page.title}`);
+    const img = document.createElement('img');
+    img.src = page.src;
+    img.alt = '';
+    img.width = 90;
+    img.height = 120;
+    const number = document.createElement('span');
+    number.textContent = String(i + 1).padStart(2, '0');
+    button.append(img, number);
+    button.addEventListener('click', () => renderPage(i));
+    return button;
+  }));
+  renderPage(0);
+  copyStatus.textContent = '';
+  outlineHeading.textContent = item.pages.length > 1 ? '本组图文内容' : '内页内容建议';
   const outline = document.querySelector('#case-outline');
   outline.replaceChildren(...item.outline.map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
   dialog.scrollTop = 0;
@@ -81,6 +183,17 @@ document.querySelectorAll('[data-case]').forEach(button => button.addEventListen
 document.querySelector('#close-dialog').addEventListener('click', () => dialog.close());
 document.querySelector('#previous-case').addEventListener('click', () => renderCase(selectedCase - 1));
 document.querySelector('#next-case').addEventListener('click', () => renderCase(selectedCase + 1));
+previousPage.addEventListener('click', () => renderPage(selectedPage - 1));
+nextPage.addEventListener('click', () => renderPage(selectedPage + 1));
+copyButton.addEventListener('click', async () => {
+  const item = cases[selectedCase];
+  try {
+    await navigator.clipboard.writeText(`${item.copyTitle}\n\n${item.copy}\n\n${item.tags}`);
+    copyStatus.textContent = '已复制';
+  } catch {
+    copyStatus.textContent = '未能自动复制，请选中文案复制。';
+  }
+});
 dialog.addEventListener('close', () => {
   document.body.classList.remove('dialog-open');
   if (triggerElement) triggerElement.focus({preventScroll:true});
@@ -91,6 +204,7 @@ dialog.addEventListener('click', event => {
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
 });
 dialog.addEventListener('keydown', event => {
-  if (event.key === 'ArrowRight') { event.preventDefault(); renderCase(selectedCase + 1); }
-  if (event.key === 'ArrowLeft') { event.preventDefault(); renderCase(selectedCase - 1); }
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (event.key === 'ArrowRight') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage + 1) : renderCase(selectedCase + 1); }
+  if (event.key === 'ArrowLeft') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage - 1) : renderCase(selectedCase - 1); }
 });
