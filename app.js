@@ -55,7 +55,13 @@ if ('serviceWorker' in navigator) {
 
 const dialog = document.querySelector('#case-dialog');
 cases.push(...newCases);
-cases.forEach(item => { item.pages ??= [{src: `assets/${item.id}-cover.png`, title: item.alt}]; });
+const caseGroups = {cafe: 'food', bakery: 'food', creator: 'creator', fashion: 'style'};
+cases.forEach(item => {
+  item.pages ??= [{src: `assets/${item.id}-cover.png`, title: item.alt}];
+  item.group ??= caseGroups[item.id] || 'life';
+});
+cases.sort((a, b) => Number(Boolean(b.isNew)) - Number(Boolean(a.isNew)));
+let visibleCases = cases;
 const grid = document.querySelector('.work-grid');
 for (const item of newCases) {
   const article = document.createElement('article');
@@ -64,7 +70,7 @@ for (const item of newCases) {
   cover.className = `cover-button ${item.id}`;
   cover.dataset.case = item.id;
   cover.setAttribute('aria-haspopup', 'dialog');
-  cover.setAttribute('aria-label', `查看${item.label}示例：${item.title}，共4张`);
+  cover.setAttribute('aria-label', `查看${item.label}示例：${item.title}，共${item.pages.length}张`);
   const image = document.createElement('img');
   image.src = item.pages[0].src;
   image.alt = item.alt;
@@ -74,7 +80,7 @@ for (const item of newCases) {
   image.decoding = 'async';
   const badge = document.createElement('span');
   badge.className = 'page-badge';
-  badge.textContent = '4 张图文';
+  badge.textContent = `${item.isNew ? '新上架 · ' : ''}${item.pages.length} 张图文`;
   const view = document.createElement('span');
   view.className = 'view-label';
   view.textContent = '查看整组 ↗';
@@ -97,6 +103,28 @@ for (const item of newCases) {
   article.append(cover, meta, heading, description);
   grid.append(article);
 }
+const cardById = new Map([...grid.children].map(card => [card.querySelector('[data-case]').dataset.case, card]));
+cases.forEach((item, index) => {
+  const card = cardById.get(item.id);
+  const coverImage = card.querySelector('.cover-button img');
+  coverImage.loading = index === 0 ? 'eager' : 'lazy';
+  coverImage.fetchPriority = index === 0 ? 'high' : 'auto';
+  grid.append(card);
+});
+const filterButtons = [...document.querySelectorAll('[data-filter]')];
+for (const button of filterButtons) {
+  const count = button.dataset.filter === 'all' ? cases.length : cases.filter(item => item.group === button.dataset.filter).length;
+  button.querySelector('span').textContent = String(count);
+  button.addEventListener('click', () => applyFilter(button.dataset.filter));
+}
+function applyFilter(filter) {
+  visibleCases = cases.filter(item => filter === 'all' || item.group === filter);
+  for (const item of cases) cardById.get(item.id).hidden = !visibleCases.includes(item);
+  for (const button of filterButtons) button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
+  document.querySelector('#filter-status').textContent = `共 ${visibleCases.length} 组作品`;
+}
+applyFilter('all');
+document.querySelector('.work-browser').hidden = false;
 document.querySelector('#works-count').textContent = String(cases.length).padStart(2, '0');
 const gallery = document.createElement('div');
 gallery.className = 'gallery-navigation';
@@ -148,7 +176,10 @@ function renderPage(index) {
 function renderCase(index) {
   selectedCase = (index + cases.length) % cases.length;
   const item = cases[selectedCase];
-  const values = {'case-counter': `设计示例 ${selectedCase + 1} / ${cases.length}`, 'case-category': item.category, 'case-title': item.title, 'case-summary': item.summary, 'case-design': item.design, 'case-copy-title': item.copyTitle, 'case-copy': item.copy, 'case-tags': item.tags};
+  const position = visibleCases.indexOf(item) + 1;
+  const values = {'case-counter': `设计示例 ${position} / ${visibleCases.length}`, 'case-category': item.category, 'case-title': item.title, 'case-summary': item.summary, 'case-design': item.design, 'case-copy-title': item.copyTitle, 'case-copy': item.copy, 'case-tags': item.tags};
+  document.querySelector('#previous-case').disabled = visibleCases.length < 2;
+  document.querySelector('#next-case').disabled = visibleCases.length < 2;
   for (const [id, value] of Object.entries(values)) document.getElementById(id).textContent = value;
   thumbnails.replaceChildren(...item.pages.map((page, i) => {
     const button = document.createElement('button');
@@ -173,6 +204,12 @@ function renderCase(index) {
   outline.replaceChildren(...item.outline.map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
   dialog.scrollTop = 0;
 }
+function moveCase(step) {
+  if (visibleCases.length < 2) return;
+  const position = visibleCases.indexOf(cases[selectedCase]);
+  const next = visibleCases[(position + step + visibleCases.length) % visibleCases.length];
+  renderCase(cases.indexOf(next));
+}
 document.querySelectorAll('[data-case]').forEach(button => button.addEventListener('click', () => {
   triggerElement = button;
   renderCase(cases.findIndex(item => item.id === button.dataset.case));
@@ -181,8 +218,8 @@ document.querySelectorAll('[data-case]').forEach(button => button.addEventListen
   document.querySelector('#close-dialog').focus({preventScroll:true});
 }));
 document.querySelector('#close-dialog').addEventListener('click', () => dialog.close());
-document.querySelector('#previous-case').addEventListener('click', () => renderCase(selectedCase - 1));
-document.querySelector('#next-case').addEventListener('click', () => renderCase(selectedCase + 1));
+document.querySelector('#previous-case').addEventListener('click', () => moveCase(-1));
+document.querySelector('#next-case').addEventListener('click', () => moveCase(1));
 previousPage.addEventListener('click', () => renderPage(selectedPage - 1));
 nextPage.addEventListener('click', () => renderPage(selectedPage + 1));
 copyButton.addEventListener('click', async () => {
@@ -205,6 +242,6 @@ dialog.addEventListener('click', event => {
 });
 dialog.addEventListener('keydown', event => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-  if (event.key === 'ArrowRight') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage + 1) : renderCase(selectedCase + 1); }
-  if (event.key === 'ArrowLeft') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage - 1) : renderCase(selectedCase - 1); }
+  if (event.key === 'ArrowRight') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage + 1) : moveCase(1); }
+  if (event.key === 'ArrowLeft') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage - 1) : moveCase(-1); }
 });
