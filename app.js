@@ -60,7 +60,7 @@ cases.forEach(item => {
   item.pages ??= [{src: `assets/${item.id}-cover.png`, title: item.alt}];
   item.group ??= caseGroups[item.id] || 'life';
 });
-cases.sort((a, b) => Number(Boolean(b.isNew)) - Number(Boolean(a.isNew)));
+cases.sort((a, b) => Number(b.isNew || 0) - Number(a.isNew || 0));
 let visibleCases = cases;
 const grid = document.querySelector('.work-grid');
 for (const item of newCases) {
