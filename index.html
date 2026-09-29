@@ -4,70 +4,98 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ef">
-  <meta name="description" content="心安之地的小红书图文作品集。按餐饮门店、生活方式、旅行、穿搭美业与个人 IP 浏览十九组设计示例，查看完整图文与配套文案。">
+  <meta name="description" content="心安之地的小红书图文作品集。覆盖品牌门店、产品介绍、企业知识、个人 IP 与生活方式的图文设计。浏览完整系列作品，了解设计思路与合作方式。">
   <title>心安之地 · 小红书图文作品集</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="gallery.css">
   <script src="new-cases.js" defer></script>
+  <link rel="stylesheet" href="portfolio.css">
+  <script src="recent-cases.js" defer></script>
+  <script src="asset-previews.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#works">跳到作品示例</a>
   <header class="site-header shell">
     <a class="brand" href="#" aria-label="心安之地，返回顶部"><span class="brand-mark" aria-hidden="true">心</span><span>心安之地<small>图文设计与内容表达</small></span></a>
-    <nav aria-label="主要导航"><a class="nav-work" href="#works">作品示例</a><a href="#services">服务说明</a></nav>
+    <nav aria-label="主要导航"><a class="nav-work" href="#works">作品示例</a><a href="#services">服务说明</a><a class="nav-contact" href="#contact">聊聊需求</a></nav>
   </header>
 
   <main>
     <section class="intro shell" aria-labelledby="page-title">
-      <div><p class="eyebrow">小红书图文 · 作品集</p><h1 id="page-title">让你的内容，<br>被<span class="accent">好好看见。</span></h1></div>
-      <div class="intro-note"><p>从一个想法，到一篇完整图文。<br>把卖点讲清楚，也把画面做好看。</p><span>选题 / 文案 / 封面 / 内页排版</span></div>
+      <div class="intro-copy">
+        <p class="eyebrow">心安之地 / 图文设计作品集</p>
+        <h1 id="page-title">好内容，<br>也值得<span class="accent">好设计。</span></h1>
+        <p class="intro-description">产品上新、品牌介绍、课程知识。<br>把你的资料和想法，整理成一套清晰、好看的图文。</p>
+        <div class="intro-actions"><a class="primary-link" href="#works">看看完整作品</a><a class="text-link" href="#contact">我有一个制作需求</a></div>
+        <p class="intro-scope">选题文案 / 商业海报 / 系列图文 / AI 视觉</p>
+      </div>
+      <div class="intro-showcase" aria-label="近期图文作品选览">
+        <div class="showcase-top"><span>RECENT WORK / 2026.09</span><span>从氛围到信息</span></div>
+        <div class="showcase-images">
+          <img src="assets/previews/platform-content-01.webp" alt="企业知识图解：同一条内容换个平台为何失效" width="540" height="720">
+          <img src="assets/previews/tailoring-01.webp" alt="西装定制品牌图文设计" width="540" height="720" fetchpriority="high">
+          <img src="assets/previews/lab-tubes-01.webp" alt="离心管系列产品介绍设计" width="540" height="720">
+        </div>
+        <p>品牌的气质，产品的细节，知识的逻辑。</p>
+      </div>
     </section>
 
     <section class="works shell" id="works" aria-labelledby="works-title">
-      <div class="section-line"><h2 id="works-title">作品示例 <span id="works-count">19</span></h2><p>虚拟主题设计 · 点击查看图片与文案</p></div>
+      <div class="section-line"><h2 id="works-title">作品精选 <span id="works-count">24</span></h2><p>按你的行业找灵感 · 点击查看完整系列</p></div>
       <div class="work-browser" hidden>
         <div class="work-filters" role="group" aria-label="按类型筛选作品">
           <button type="button" data-filter="all" aria-pressed="true" aria-controls="work-grid">全部作品 <span></span></button>
+          <button type="button" data-filter="recent" aria-pressed="false" aria-controls="work-grid">近期作品 <span></span></button>
+          <button type="button" data-filter="product" aria-pressed="false" aria-controls="work-grid">产品介绍 <span></span></button>
+          <button type="button" data-filter="education" aria-pressed="false" aria-controls="work-grid">企业知识 <span></span></button>
           <button type="button" data-filter="food" aria-pressed="false" aria-controls="work-grid">餐饮门店 <span></span></button>
           <button type="button" data-filter="life" aria-pressed="false" aria-controls="work-grid">生活方式 <span></span></button>
           <button type="button" data-filter="tourism" aria-pressed="false" aria-controls="work-grid">旅行 <span></span></button>
-          <button type="button" data-filter="style" aria-pressed="false" aria-controls="work-grid">穿搭美业 <span></span></button>
+          <button type="button" data-filter="style" aria-pressed="false" aria-controls="work-grid">服饰美业 <span></span></button>
           <button type="button" data-filter="creator" aria-pressed="false" aria-controls="work-grid">个人 IP <span></span></button>
         </div>
         <p class="filter-status" id="filter-status" aria-live="polite"></p>
       </div>
       <div class="work-grid" id="work-grid">
         <article class="work-card">
-          <button class="cover-button cafe" data-case="cafe" aria-label="查看咖啡店示例：把周末留给一杯咖啡" aria-haspopup="dialog"><img src="assets/cafe-cover.png" alt="咖啡店图文封面：把周末留给一杯咖啡，深绿与奶油色的咖啡主题排版" width="1086" height="1448" fetchpriority="high"><span class="view-label">查看示例 <span aria-hidden="true">↗</span></span></button>
+          <button class="cover-button cafe" data-case="cafe" aria-label="查看咖啡店示例：把周末留给一杯咖啡" aria-haspopup="dialog"><img src="assets/previews/cafe-01.webp" alt="咖啡店图文封面：把周末留给一杯咖啡，深绿与奶油色的咖啡主题排版" width="1086" height="1448" fetchpriority="high"><span class="view-label">查看示例 <span aria-hidden="true">↗</span></span></button>
           <div class="work-meta"><span>01 / 咖啡门店</span><span>生活方式 · 氛围种草</span></div>
           <h3><button data-case="cafe" aria-haspopup="dialog">把周末留给一杯咖啡</button></h3>
           <p>用一个放松的日常场景，让人记住一家店。</p>
         </article>
         <article class="work-card">
-          <button class="cover-button bakery" data-case="bakery" aria-label="查看甜品店示例：今天的快乐是草莓给的" aria-haspopup="dialog"><img src="assets/bakery-cover.png" alt="甜品店图文封面：今天的快乐是草莓给的，草莓蛋糕与樱桃红主题排版" width="1086" height="1448"><span class="view-label">查看示例 <span aria-hidden="true">↗</span></span></button>
+          <button class="cover-button bakery" data-case="bakery" aria-label="查看甜品店示例：今天的快乐是草莓给的" aria-haspopup="dialog"><img src="assets/previews/bakery-01.webp" alt="甜品店图文封面：今天的快乐是草莓给的，草莓蛋糕与樱桃红主题排版" width="1086" height="1448"><span class="view-label">查看示例 <span aria-hidden="true">↗</span></span></button>
           <div class="work-meta"><span>02 / 甜品烘焙</span><span>产品展示 · 情绪文案</span></div>
           <h3><button data-case="bakery" aria-haspopup="dialog">今天的快乐是草莓给的</button></h3>
           <p>把产品放在画面中心，让文案带出一点心动。</p>
         </article>
         <article class="work-card">
-          <button class="cover-button creator" data-case="creator" aria-label="查看个人 IP 示例：小红书新手第一篇发什么" aria-haspopup="dialog"><img src="assets/creator-cover.png" alt="个人 IP 知识图文封面：小红书新手第一篇发什么，蓝黄对比的知识清单排版" width="1086" height="1448"><span class="view-label">查看示例 <span aria-hidden="true">↗</span></span></button>
+          <button class="cover-button creator" data-case="creator" aria-label="查看个人 IP 示例：小红书新手第一篇发什么" aria-haspopup="dialog"><img src="assets/previews/creator-01.webp" alt="个人 IP 知识图文封面：小红书新手第一篇发什么，蓝黄对比的知识清单排版" width="1086" height="1448"><span class="view-label">查看示例 <span aria-hidden="true">↗</span></span></button>
           <div class="work-meta"><span>03 / 个人 IP</span><span>知识分享 · 清单干货</span></div>
           <h3><button data-case="creator" aria-haspopup="dialog">小红书新手，第一篇发什么？</button></h3>
           <p>一个明确的问题，三个可以马上动笔的方向。</p>
         </article>
       </div>
-      <p class="sample-note">以上为设计示例，用于展示内容与视觉风格；不代表真实客户委托或运营成果。</p>
+      <p class="sample-note">作品用于展示视觉与内容组织能力。概念设计已在案例中说明，不代表真实门店、客户委托或运营成果。</p>
     </section>
 
     <section class="services shell" id="services" aria-labelledby="services-title">
-      <div class="services-heading"><div><p class="eyebrow">从需求到图文</p><h2 id="services-title">你提供想法，<br>我来整理成内容。</h2></div><p>适合个人 IP、小商家与工作室。<br>提供行业、产品、需求和参考风格，<br>一起确认内容方向，再开始制作。</p></div>
+      <div class="services-heading"><div><p class="eyebrow">从需求到图文</p><h2 id="services-title">你提供想法，<br>我来整理成内容。</h2></div><p>适合品牌门店、产品团队、个人 IP 与工作室。<br>提供行业、产品、需求和参考风格，<br>一起确认内容方向，再开始制作。</p></div>
       <div class="price-grid">
         <article class="price-card"><p class="plan-number">01</p><h3>体验单</h3><p class="price"><span>¥</span>39<small>/ 1 篇</small></p><ul><li>1 篇图文策划</li><li>1 个封面标题</li><li>5–7 页内容排版</li><li>1 次小修改</li></ul></article>
         <article class="price-card"><p class="plan-number">02</p><h3>标准版</h3><p class="price"><span>¥</span>99<small>/ 3 篇</small></p><ul><li>3 篇图文文案</li><li>3 个封面标题</li><li>每篇 8 页内排版</li><li>标签建议</li></ul></article>
         <article class="price-card"><p class="plan-number">03</p><h3>进阶版</h3><p class="price"><span>¥</span>299<small>/ 10 篇</small></p><ul><li>10 篇图文文案</li><li>月度选题方向</li><li>账号风格建议</li><li>优先沟通修改</li></ul></article>
       </div>
-      <div class="service-foot"><p>具体服务内容可按实际需求调整。专注内容表达，不承诺涨粉。</p><p>想聊聊你的内容？<br><strong>在小红书私信「心安之地」</strong></p></div>
+      <div class="service-foot"><p>以上为图文服务参考，实际页数、素材制作、修改范围与交付时间会在制作前确认。<br>品牌视觉、产品图册等需求单独沟通。专注内容表达，不承诺涨粉。</p></div>
+    </section>
+    <section class="contact shell" id="contact" aria-labelledby="contact-title">
+      <div class="contact-heading"><p class="eyebrow">让想法开始落地</p><h2 id="contact-title">下一组图文，<br>可以是你的。</h2><p>带上简单的需求来聊，不必先写一份完整方案。</p></div>
+      <div class="contact-details">
+        <ol class="brief-list"><li><span>01</span><div><strong>你想做什么</strong><p>行业、产品或主题，准备发在哪里。</p></div></li><li><span>02</span><div><strong>你有什么资料</strong><p>产品照片、文字内容，或喜欢的参考作品。</p></div></li><li><span>03</span><div><strong>你的时间与范围</strong><p>预计页数、交付时间和预算。</p></div></li></ol>
+        <div class="contact-channel"><div><strong>小红书私信「心安之地」</strong><p>小红书号：<span id="contact-id">49936549707</span></p></div><button type="button" class="copy-button" id="copy-contact">复制小红书号</button></div>
+        <p class="contact-status" id="contact-status" role="status"></p>
+      </div>
     </section>
   </main>
 
@@ -75,7 +103,7 @@
 
   <dialog id="case-dialog" aria-labelledby="case-title">
     <div class="dialog-toolbar"><span id="case-counter"></span><div class="dialog-controls"><button class="icon-button" id="previous-case" aria-label="上一个示例">←</button><button class="icon-button" id="next-case" aria-label="下一个示例">→</button><button class="icon-button close-button" id="close-dialog" aria-label="关闭示例">×</button></div></div>
-    <div class="case-layout"><div class="case-art"><img id="case-image" src="assets/cafe-cover.png" alt="" width="1086" height="1448"><a class="download-link" id="case-download" href="assets/cafe-cover.png" download>下载封面原图 ↓</a></div><div class="case-content"><p class="eyebrow" id="case-category"></p><h2 id="case-title"></h2><p class="case-summary" id="case-summary"></p><div class="case-detail"><h3>设计思路</h3><p id="case-design"></p></div><div class="case-detail"><h3>配套文案示例</h3><p class="copy-title" id="case-copy-title"></p><p class="post-copy" id="case-copy"></p><p class="hashtags" id="case-tags"></p></div><div class="case-detail"><h3>内页内容建议</h3><ol id="case-outline"></ol></div><p class="detail-disclaimer">虚拟主题设计示例。实际制作会结合你的产品资料、表达习惯与参考风格调整。</p></div></div>
+    <div class="case-layout"><div class="case-art"><img id="case-image" src="assets/previews/cafe-01.webp" alt="" width="1086" height="1448"><a class="download-link" id="case-download" href="assets/cafe-cover.png" download>下载封面原图 ↓</a></div><div class="case-content"><p class="eyebrow" id="case-category"></p><h2 id="case-title"></h2><p class="case-summary" id="case-summary"></p><div class="case-detail"><h3>设计思路</h3><p id="case-design"></p></div><div class="case-detail"><h3>配套文案示例</h3><p class="copy-title" id="case-copy-title"></p><p class="post-copy" id="case-copy"></p><p class="hashtags" id="case-tags"></p></div><div class="case-detail"><h3>内页内容建议</h3><ol id="case-outline"></ol></div><p class="detail-disclaimer">虚拟主题设计示例。实际制作会结合你的产品资料、表达习惯与参考风格调整。</p></div></div>
   </dialog>
 </body>
 </html>

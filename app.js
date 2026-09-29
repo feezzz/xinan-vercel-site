@@ -54,8 +54,8 @@ if ('serviceWorker' in navigator) {
 }
 
 const dialog = document.querySelector('#case-dialog');
-cases.push(...newCases);
-const caseGroups = {cafe: 'food', bakery: 'food', creator: 'creator', fashion: 'style'};
+cases.push(...recentCases, ...newCases);
+const caseGroups = {cafe: 'food', bakery: 'food', creator: 'creator', fashion: 'style', travel: 'tourism', fragrance: 'product'};
 cases.forEach(item => {
   item.pages ??= [{src: `assets/${item.id}-cover.png`, title: item.alt}];
   item.group ??= caseGroups[item.id] || 'life';
@@ -63,7 +63,7 @@ cases.forEach(item => {
 cases.sort((a, b) => Number(b.isNew || 0) - Number(a.isNew || 0));
 let visibleCases = cases;
 const grid = document.querySelector('.work-grid');
-for (const item of newCases) {
+for (const item of [...recentCases, ...newCases]) {
   const article = document.createElement('article');
   article.className = 'work-card';
   const cover = document.createElement('button');
@@ -72,7 +72,7 @@ for (const item of newCases) {
   cover.setAttribute('aria-haspopup', 'dialog');
   cover.setAttribute('aria-label', `查看${item.label}示例：${item.title}，共${item.pages.length}张`);
   const image = document.createElement('img');
-  image.src = item.pages[0].src;
+  image.src = assetPreviews[item.pages[0].src]?.cover || item.pages[0].src;
   image.alt = item.alt;
   image.width = 1080;
   image.height = 1440;
@@ -80,7 +80,7 @@ for (const item of newCases) {
   image.decoding = 'async';
   const badge = document.createElement('span');
   badge.className = 'page-badge';
-  badge.textContent = `${item.isNew ? '新上架 · ' : ''}${item.pages.length} 张图文`;
+  badge.textContent = `${item.recent ? '近期作品 · ' : ''}${item.pages.length} 张图文`;
   const view = document.createElement('span');
   view.className = 'view-label';
   view.textContent = '查看整组 ↗';
@@ -107,18 +107,25 @@ const cardById = new Map([...grid.children].map(card => [card.querySelector('[da
 cases.forEach((item, index) => {
   const card = cardById.get(item.id);
   const coverImage = card.querySelector('.cover-button img');
+  const preview = assetPreviews[item.pages[0].src];
+  coverImage.src = preview?.cover || item.pages[0].src;
+  if (preview) { coverImage.width = preview.width; coverImage.height = preview.height; }
+  coverImage.alt = item.alt;
   coverImage.loading = index === 0 ? 'eager' : 'lazy';
   coverImage.fetchPriority = index === 0 ? 'high' : 'auto';
   grid.append(card);
 });
 const filterButtons = [...document.querySelectorAll('[data-filter]')];
 for (const button of filterButtons) {
-  const count = button.dataset.filter === 'all' ? cases.length : cases.filter(item => item.group === button.dataset.filter).length;
+  const count = button.dataset.filter === 'all' ? cases.length : cases.filter(item => matchesFilter(item, button.dataset.filter)).length;
   button.querySelector('span').textContent = String(count);
   button.addEventListener('click', () => applyFilter(button.dataset.filter));
 }
+function matchesFilter(item, filter) {
+  return filter === 'all' || (filter === 'recent' ? item.recent === true : item.group === filter);
+}
 function applyFilter(filter) {
-  visibleCases = cases.filter(item => filter === 'all' || item.group === filter);
+  visibleCases = cases.filter(item => matchesFilter(item, filter));
   for (const item of cases) cardById.get(item.id).hidden = !visibleCases.includes(item);
   for (const button of filterButtons) button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
   document.querySelector('#filter-status').textContent = `共 ${visibleCases.length} 组作品`;
@@ -151,6 +158,15 @@ const copyStatus = document.createElement('span');
 copyStatus.className = 'copy-status';
 copyStatus.setAttribute('role', 'status');
 copyButton.after(copyStatus);
+const caseContact = document.createElement('a');
+caseContact.className = 'primary-link case-contact';
+caseContact.href = '#contact';
+caseContact.textContent = '我想做类似的图文';
+document.querySelector('.detail-disclaimer').after(caseContact);
+caseContact.addEventListener('click', () => {
+  triggerElement = document.querySelector('#copy-contact');
+  dialog.close();
+});
 let selectedCase = 0;
 let selectedPage = 0;
 let triggerElement = null;
@@ -164,8 +180,9 @@ function renderPage(index) {
   image.alt = `${item.label || item.title}，第${selectedPage + 1}张：${page.title}`;
   const download = document.querySelector('#case-download');
   download.href = page.src;
-  download.download = `心安之地-${item.id}-${String(selectedPage + 1).padStart(2, '0')}.png`;
-  download.textContent = item.pages.length > 1 ? '下载当前原图 ↓' : '下载封面原图 ↓';
+  const extension = page.src.split('.').pop();
+  download.download = `心安之地-${item.id}-${String(selectedPage + 1).padStart(2, '0')}.${extension}`;
+  download.textContent = item.pages.length > 1 ? '下载当前高清图 ↓' : '下载封面高清图 ↓';
   gallery.hidden = item.pages.length === 1;
   previousPage.disabled = selectedPage === 0;
   nextPage.disabled = selectedPage === item.pages.length - 1;
@@ -177,7 +194,7 @@ function renderCase(index) {
   selectedCase = (index + cases.length) % cases.length;
   const item = cases[selectedCase];
   const position = visibleCases.indexOf(item) + 1;
-  const values = {'case-counter': `设计示例 ${position} / ${visibleCases.length}`, 'case-category': item.category, 'case-title': item.title, 'case-summary': item.summary, 'case-design': item.design, 'case-copy-title': item.copyTitle, 'case-copy': item.copy, 'case-tags': item.tags};
+  const values = {'case-counter': `作品 ${position} / ${visibleCases.length}`, 'case-category': item.category, 'case-title': item.title, 'case-summary': item.summary, 'case-design': item.design, 'case-copy-title': item.copyTitle, 'case-copy': item.copy, 'case-tags': item.tags};
   document.querySelector('#previous-case').disabled = visibleCases.length < 2;
   document.querySelector('#next-case').disabled = visibleCases.length < 2;
   for (const [id, value] of Object.entries(values)) document.getElementById(id).textContent = value;
@@ -187,7 +204,9 @@ function renderCase(index) {
     button.type = 'button';
     button.setAttribute('aria-label', `查看第${i + 1}张：${page.title}`);
     const img = document.createElement('img');
-    img.src = page.src;
+    img.src = assetPreviews[page.src]?.thumb || page.src;
+    img.loading = 'lazy';
+    img.decoding = 'async';
     img.alt = '';
     img.width = 90;
     img.height = 120;
@@ -197,6 +216,9 @@ function renderCase(index) {
     button.addEventListener('click', () => renderPage(i));
     return button;
   }));
+  document.querySelector('.detail-disclaimer').textContent = item.disclaimer || '虚拟主题设计示例。实际制作会结合你的产品资料、表达习惯与参考风格调整。';
+  document.querySelector('#case-copy-title').closest('.case-detail').querySelector('h3').textContent = item.recent ? '适用场景与制作方向' : '配套文案示例';
+  copyButton.hidden = Boolean(item.recent);
   renderPage(0);
   copyStatus.textContent = '';
   outlineHeading.textContent = item.pages.length > 1 ? '本组图文内容' : '内页内容建议';
@@ -244,4 +266,14 @@ dialog.addEventListener('keydown', event => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   if (event.key === 'ArrowRight') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage + 1) : moveCase(1); }
   if (event.key === 'ArrowLeft') { event.preventDefault(); cases[selectedCase].pages.length > 1 ? renderPage(selectedPage - 1) : moveCase(-1); }
+});
+
+document.querySelector('#copy-contact').addEventListener('click', async () => {
+  const status = document.querySelector('#contact-status');
+  try {
+    await navigator.clipboard.writeText(document.querySelector('#contact-id').textContent.trim());
+    status.textContent = '已复制。打开小红书，搜索这个小红书号即可找到我。';
+  } catch {
+    status.textContent = '请长按或选中小红书号 49936549707 复制。';
+  }
 });
