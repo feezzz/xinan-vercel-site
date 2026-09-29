@@ -54,7 +54,7 @@ if ('serviceWorker' in navigator) {
 }
 
 const dialog = document.querySelector('#case-dialog');
-cases.push(...recentCases, ...newCases);
+cases.push(...industryCases, ...recentCases, ...newCases);
 const caseGroups = {cafe: 'food', bakery: 'food', creator: 'creator', fashion: 'style', travel: 'tourism', fragrance: 'product'};
 cases.forEach(item => {
   item.pages ??= [{src: `assets/${item.id}-cover.png`, title: item.alt}];
@@ -63,7 +63,7 @@ cases.forEach(item => {
 cases.sort((a, b) => Number(b.isNew || 0) - Number(a.isNew || 0));
 let visibleCases = cases;
 const grid = document.querySelector('.work-grid');
-for (const item of [...recentCases, ...newCases]) {
+for (const item of [...industryCases, ...recentCases, ...newCases]) {
   const article = document.createElement('article');
   article.className = 'work-card';
   const cover = document.createElement('button');
@@ -80,7 +80,7 @@ for (const item of [...recentCases, ...newCases]) {
   image.decoding = 'async';
   const badge = document.createElement('span');
   badge.className = 'page-badge';
-  badge.textContent = `${item.recent ? '近期作品 · ' : ''}${item.pages.length} 张图文`;
+  badge.textContent = `${item.concept ? '概念案例 · ' : item.recent ? '近期作品 · ' : ''}${item.pages.length} 张图文`;
   const view = document.createElement('span');
   view.className = 'view-label';
   view.textContent = '查看整组 ↗';
@@ -217,8 +217,8 @@ function renderCase(index) {
     return button;
   }));
   document.querySelector('.detail-disclaimer').textContent = item.disclaimer || '虚拟主题设计示例。实际制作会结合你的产品资料、表达习惯与参考风格调整。';
-  document.querySelector('#case-copy-title').closest('.case-detail').querySelector('h3').textContent = item.recent ? '适用场景与制作方向' : '配套文案示例';
-  copyButton.hidden = Boolean(item.recent);
+  document.querySelector('#case-copy-title').closest('.case-detail').querySelector('h3').textContent = item.recent && !item.concept ? '适用场景与制作方向' : '配套文案示例';
+  copyButton.hidden = Boolean(item.recent && !item.concept);
   renderPage(0);
   copyStatus.textContent = '';
   outlineHeading.textContent = item.pages.length > 1 ? '本组图文内容' : '内页内容建议';
